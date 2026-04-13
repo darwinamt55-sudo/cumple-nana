@@ -18,7 +18,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Importante para que no salgan barras de desplazamiento */
             position: relative;
         }
 
@@ -30,7 +30,7 @@
             border-radius: 30px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             text-align: center;
-            z-index: 10;
+            z-index: 10; /* La tarjeta siempre por debajo de las fotos */
             position: relative;
         }
 
@@ -98,7 +98,7 @@
             transition: 0.3s;
             z-index: 11;
             width: 100%;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; /* Quita el flash azul en celular */
         }
 
         .btn-surprise:active { transform: scale(0.95); }
@@ -113,19 +113,20 @@
             z-index: 5;
         }
 
-        /* AJUSTE PARA FOTOS EN CELULAR */
-        .flying-photo {
-            width: 70px; /* Un poco más pequeñas para que no tapen todo el celular */
-            height: 70px;
-            border-radius: 10px;
+        /* --- ESTILO DE LAS FOTOS CONFETI (CORREGIDO PARA CELULAR) --- */
+        .confetti-photo {
+            width: 80px; /* Tamaño perfecto para que se vea en celular */
+            height: 80px;
+            border-radius: 12px;
             border: 3px solid white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             object-fit: cover;
-            position: fixed; /* Fixed para asegurar posición en pantalla móvil */
+            position: fixed; /* FIXED asegura que se renderice sobre la pantalla, no sobre la tarjeta */
             pointer-events: none;
-            z-index: 100;
+            z-index: 9999; /* Z-INDEX ALTÍSIMO para estar sobre todo */
             opacity: 0;
         }
+        /* ------------------------------------------------------------ */
     </style>
 </head>
 <body>
@@ -159,60 +160,64 @@
         ];
 
         function lanzarSorpresaTotal() {
-            // Confeti
+            // 1. Confeti normal de fondo
             confetti({
                 particleCount: 100,
                 spread: 70,
                 origin: { y: 0.7 }
             });
 
+            // 2. Explosión de fotos tipo confeti
             const btn = document.getElementById('surpriseBtn');
             const rect = btn.getBoundingClientRect();
             
-            // Punto de salida: centro del botón
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+            // Punto de origen exacto: centro del botón en la pantalla
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
 
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 12; i++) {
                 const img = document.createElement('img');
                 img.src = flyingPhotosLinks[Math.floor(Math.random() * flyingPhotosLinks.length)];
-                img.className = 'flying-photo';
+                img.className = 'confetti-photo';
+                // Importante: añadir al body, no a la tarjeta
                 document.body.appendChild(img);
 
-                // Ángulo aleatorio para que "exploten" hacia todas partes
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 100 + Math.random() * 150; // Cuanto se alejan del centro
-                
-                const destX = centerX + Math.cos(angle) * distance - 35; // -35 es mitad del ancho de la foto
-                const destY = centerY + Math.sin(angle) * distance - 35;
+                // Configurar posición inicial: centrada en el botón
+                gsap.set(img, { x: startX - 40, y: startY - 40, scale: 0.1, opacity: 0 });
 
-                // Animación GSAP mejorada para celular
-                gsap.fromTo(img, 
-                    { x: centerX - 35, y: centerY - 35, scale: 0.1, opacity: 0, rotation: 0 },
-                    { 
-                        duration: 0.8, 
-                        x: destX, 
-                        y: destY, 
-                        scale: 1, 
-                        opacity: 1, 
-                        rotation: Math.random() * 720,
-                        ease: "back.out(1.7)",
-                        onComplete: () => {
-                            // Después de explotar, caen suavemente y desaparecen
-                            gsap.to(img, {
-                                duration: 2,
-                                y: window.innerHeight + 100,
-                                opacity: 0,
-                                rotation: "+=180",
-                                delay: 1,
-                                onComplete: () => img.remove()
-                            });
-                        }
+                // Calcular trayectoria circular aleatoria (explosión)
+                const angle = Math.random() * Math.PI * 2; // Ángulo aleatorio 360°
+                const velocity = 15 + Math.random() * 25; // Fuerza del disparo
+                
+                const tx = Math.cos(angle) * velocity * 12; 
+                const ty = Math.sin(angle) * velocity * 12;
+
+                // Animación: Explosión y luego caída suave
+                gsap.to(img, {
+                    duration: 0.8,
+                    scale: 1,
+                    opacity: 1,
+                    x: `+=${tx}`,
+                    y: `+=${ty}`,
+                    rotation: Math.random() * 720, // Muchas vueltas
+                    ease: "power2.out",
+                    onComplete: () => {
+                        // Caída suave tipo gravedad
+                        gsap.to(img, {
+                            duration: 3 + Math.random() * 2, // Tiempo de caída
+                            y: window.innerHeight + 100, // Cae hasta salir de la pantalla
+                            x: `+=${(Math.random() - 0.5) * 200}`, // Movimiento horizontal suave
+                            rotation: "+=360",
+                            opacity: 0, // Se desvanece al final
+                            ease: "power1.in",
+                            onComplete: () => img.remove() // Eliminar del DOM para no gastar memoria
+                        });
                     }
-                );
+                });
             }
         }
 
+        // Contador dinámico
         const fechaNacimiento = new Date(2004, 3, 13); 
         function actualizarContador() {
             const ahora = new Date();
