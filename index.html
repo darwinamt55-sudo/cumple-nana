@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños Ñañita!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card {
+            background: white;
+            width: 85%;
+            max-width: 380px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #ff9a9e;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            margin: 10px 0;
+        }
+
+        .timer-container {
+            background: #fff0f0;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #ff6b6b;
+        }
+
+        .timer-label {
+            font-size: 0.9rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #timer {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .message {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .btn-surprise {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+            transition: 0.3s;
+            position: relative;
+            z-index: 11;
+        }
+
+        .btn-surprise:hover { background: #ff5252; }
+
+        .flying-photo {
+            width: 85px;
+            height: 85px;
+            border-radius: 12px;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            object-fit: cover;
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="https://i.ibb.co/ZpsKW1vr/Whats-App-Image-2026-04-13-at-1-30-13-PM.jpg" class="profile-img" alt="Hermana">
+        
+        <h1>¡Feliz Cumple, Ñañita! 🎂</h1>
+        <h1>YA ESTAS VIEJA🫂🤗🤣🎈</h1>
+        <div class="message">
+            ¡Hoy celebramos tus 22 años! 🎉 Gracias por ser buena en todo lo qu ehaces. ¡Te quiero muchísimo! 💖
+        </div>
+
+
+        <div class="timer-container">
+            <div class="timer-label">Llevas siendo increíble por:</div>
+            <div id="timer">Calculando...</div>
+        </div>
+
+        <button id="surpriseBtn" class="btn-surprise" onclick="lanzarSorpresaTotal()">¡MÁS SORPRESAS! topa bastantes veces🎁</button>
+    </div>
+
+    <script>
+        // Lista de fotos dinámicas (solo de tu hermana)
+        const flyingPhotosLinks = [
+            'https://i.ibb.co/PGK5D6jx/Whats-App-Image-2026-04-13-at-1-42-42-PM.jpg',
+            'https://i.ibb.co/PzJjK5NQ/Whats-App-Image-2026-04-13-at-1-45-27-PM.jpg',
+            'https://i.ibb.co/jP9w2x9L/Whats-App-Image-2026-04-13-at-1-45-37-PM-1.jpg',
+            'https://i.ibb.co/Mkqx06c0/Whats-App-Image-2026-04-13-at-1-45-36-PM-1.jpg',
+            'https://i.ibb.co/fzJhQRDx/Whats-App-Image-2026-04-13-at-1-45-37-PM.jpg',
+            'https://i.ibb.co/ZpsKW1vr/Whats-App-Image-2026-04-13-at-1-30-13-PM.jpg'
+        ];
+
+        function lanzarSorpresaTotal() {
+            // Confeti
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff6b6b', '#ffd93d', '#6bcbff', '#ff9a9e']
+            });
+
+            // Lluvia de fotos dinámicas
+            const btn = document.getElementById('surpriseBtn');
+            const btnRect = btn.getBoundingClientRect();
+
+            for (let i = 0; i < 15; i++) {
+                const img = document.createElement('img');
+                img.src = flyingPhotosLinks[Math.floor(Math.random() * flyingPhotosLinks.length)];
+                img.className = 'flying-photo';
+                document.body.appendChild(img);
+
+                gsap.set(img, {
+                    x: btnRect.left + (btnRect.width / 2) - 40,
+                    y: btnRect.top,
+                    scale: 0.1,
+                    opacity: 1
+                });
+
+                gsap.to(img, {
+                    duration: 2.5 + Math.random() * 2,
+                    x: (Math.random() - 0.5) * window.innerWidth * 1.8,
+                    y: `-=${window.innerHeight * 1.1}`,
+                    scale: 1 + Math.random(),
+                    rotation: (Math.random() - 0.5) * 1200,
+                    opacity: 0,
+                    ease: "power1.out",
+                    onComplete: () => img.remove()
+                });
+            }
+        }
+
+        // Efecto inicial al cargar
+        setTimeout(() => {
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        }, 500);
+
+        // Contador: 13 de Abril de 2004
+        const fechaNacimiento = new Date(2004, 3, 13); 
+
+        function actualizarContador() {
+            const ahora = new Date();
+            const diferencia = ahora - fechaNacimiento;
+            const años = ahora.getFullYear() - fechaNacimiento.getFullYear();
+            const diasTotales = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const segundos = Math.floor((diferencia / 1000) % 60);
+
+            document.getElementById('timer').innerHTML = 
+                `<span style="color: #ff6b6b; font-size: 1.4rem;">${años} Años</span><br>` +
+                `${diasTotales.toLocaleString()} días y contando...`;
+        }
+
+            setInterval(actualizarContador, 1000);
+            actualizarContador();
+    </script>
+</body>
+</html>
